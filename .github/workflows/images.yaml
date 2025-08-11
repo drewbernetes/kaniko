@@ -91,7 +91,7 @@ jobs:
           context: .
           file: ./deploy/Dockerfile
           platforms: ${{ steps.platforms.outputs.platforms }}
-          push: false
+          push: true
           tags: ${{ matrix.image-name }}:${{ matrix.tag }}
           no-cache-filters: certs
           # https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#github-cache
