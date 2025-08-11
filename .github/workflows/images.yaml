@@ -91,10 +91,20 @@ jobs:
           context: .
           file: ./deploy/Dockerfile
           platforms: ${{ steps.platforms.outputs.platforms }}
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ matrix.image-name }}:${{ matrix.tag }}
           no-cache-filters: certs
           # https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#github-cache
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: ${{ matrix.target }}
+
+      # Sign images if not a PR.
+      - if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
+      - if: github.event_name != 'pull_request'
+        run: |
+          cosign sign --yes ${{ matrix.image-name }}@${{ steps.build-and-push.outputs.digest }}
+          cosign verify ${{ matrix.image-name }}@${{ steps.build-and-push.outputs.digest }} \
+          --certificate-identity=https://github.com/drewbernetes/kaniko/.github/workflows/WORKFLOW_NAME@refs/heads/BRANCH_NAME \
+          --certificate-oidc-issuer=https://token.actions.githubusercontent.com
