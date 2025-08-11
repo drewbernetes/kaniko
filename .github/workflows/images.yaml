@@ -106,5 +106,5 @@ jobs:
         run: |
           cosign sign --yes ${{ matrix.image-name }}@${{ steps.build-and-push.outputs.digest }}
           cosign verify ${{ matrix.image-name }}@${{ steps.build-and-push.outputs.digest }} \
-          --certificate-identity=https://github.com/drewbernetes/kaniko/.github/workflows/WORKFLOW_NAME@refs/heads/BRANCH_NAME \
+          --certificate-identity=https://github.com/${{ github.repository_owner }}/${{ github.repository_owner }}/.github/workflows/${{ github.workflow }}@refs/heads/${{ github.ref_name }} \
           --certificate-oidc-issuer=https://token.actions.githubusercontent.com
